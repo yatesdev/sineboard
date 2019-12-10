@@ -4,7 +4,7 @@ import * as path from 'path';
 
 const IGNORED_PACKAGES: string[] = [];
 
-export default function resolve(plugins: any, emitter: any) {
+export default function resolve(plugins: string[], emitter?: any) {
   const modules: any[] = [];
   // console.log(plugins);
 
@@ -14,7 +14,7 @@ export default function resolve(plugins: any, emitter: any) {
       modules.push(require(name));
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND' && e.message.includes(name)) {
-        console.error(`Cannot find plugin "${name}".\n  Did you forget to install it?\n  npm install ${name} --save-dev`);
+        console.error(`Cannot find plugin "${name}".\n  Did you forget to install it?\n  npm install ${name} --save`);
       } else {
         // log.error(`Error during loading "${name}" plugin:\n  ${e.message}`)
       }

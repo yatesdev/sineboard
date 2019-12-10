@@ -1,11 +1,8 @@
-import Redis from 'ioredis';
-
-import { Events, ITemplate } from '@yatesdev/sineboard-core';
+import { Events, IDataSource, ITemplate } from '@yatesdev/sineboard-core';
 import { ConnectionManager } from 'connection';
 import { flatten, moduleLoader } from '../util';
 
 import { Canvas } from 'canvas';
-import * as fs from 'fs';
 
 export class TemplateInitializer {
   constructor(
@@ -33,6 +30,12 @@ export class TemplateInitializer {
   private async loadClientConfiguration(redisKey: string) {
     const configuration = JSON.parse(await this.connectionManager.redis.get(redisKey)) as ITemplate;
     // grab datasources
-    flatten(configuration).map((x) => x.dataSource);
+    const dataSources = flatten(configuration).map((x) => x.dataSource);
+    const modules = moduleLoader(dataSources.map((x) => x.name)).map( (x) => new x.default());
+    console.log(modules);
+    modules.forEach((x: IDataSource) => {
+      x.fetch();
+      console.log(x.data);
+    });
   }
 }
