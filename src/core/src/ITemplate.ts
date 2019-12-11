@@ -40,15 +40,14 @@ export abstract class ITemplate {
 
 // tslint:disable-next-line:max-classes-per-file
 export abstract class ISchedule {
-  start: string;
-  end: string;
+  startDate: string;
+  endDate: string;
   displayTime: number;
 }
 
 // tslint:disable-next-line:max-classes-per-file
 export abstract class IPageDisplay {
   name: string;
-  template: string | ITemplate;
-  dataSourceMap: Map<string, IDataSource>;
+  template: ITemplate;
   schedule: ISchedule;
 }

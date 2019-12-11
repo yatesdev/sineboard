@@ -43,7 +43,7 @@ export default class SineboardClient {
   }
 
   private async loadTemplate(): Promise<void> {
-    const templateKey = `${this.config.name}:template`;
+    const templateKey = `template:${this.config.name}`;
 
     const configPath = path.resolve(__dirname, './config.json');
     const rawConfig = fs.readFileSync(configPath);
