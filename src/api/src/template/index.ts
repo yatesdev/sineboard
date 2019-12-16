@@ -1,4 +1,4 @@
-import { Events, IDataSource, ITemplate, IPageDisplay } from '@yatesdev/sineboard-core';
+import { Events, IDataSource, IPageDisplay, ITemplate, ITemplateDefinition, IDataSourceDefinition } from '@yatesdev/sineboard-core';
 import { ConnectionManager } from '../connection';
 import { flatten, moduleLoader } from '../util';
 
@@ -35,18 +35,51 @@ export class TemplateInitializer {
 
   private async loadClientConfiguration(redisKey: string) {
     const configuration = JSON.parse(await this.connectionManager.redis.get(redisKey)) as IPageDisplay;
-    // grab datasources
-    console.log(configuration);
-    const dataSources = flatten(configuration.template).map((x) => x.dataSource);
-    const modules = moduleLoader(dataSources.map((x) => x.name)).map( (x) => new x.default());
-    console.log(modules);
-    modules.forEach((x: IDataSource) => {
-      // x.fetch();
-      // console.log(x.data);
-      this.dataSourceManager.add(x,
+
+    // initialize template instances
+    const temp = this.initTemplate(configuration.template);
+
+    flatten(temp).map((template) => {
+      console.log(template.dataSource);
+      this.dataSourceManager.add(
+        template.dataSource,
         configuration.schedule.startDate,
         configuration.schedule.endDate,
-        x.updateFrequency);
+        template.dataSource.updateFrequency,
+        () => {
+          console.log(template.name, template.dataSource.data);
+        });
     });
+  }
+
+  private initTemplate(root: ITemplateDefinition | string): ITemplate {
+    if (typeof root === 'string') {
+      const templateModule = moduleLoader([root])[0].default;
+      root = new templateModule();
+      return this.initTemplate(root);
+    }
+    if (Array.isArray(root.children)) {
+      root.children.map((child) => {
+        const initializedChild = this.initTemplate(child);
+        initializedChild.parent = root as ITemplate;
+      });
+    }
+
+    root.dataSource = this.initDataSource(root.dataSource);
+
+    return root as ITemplate;
+  }
+
+  private initDataSource(dataSource: IDataSourceDefinition | string): IDataSource {
+    // datasource: '@foo/bar'
+    if (typeof dataSource === 'string') {
+      const dataSourceModule = moduleLoader([dataSource])[0].default;
+      dataSource = new dataSourceModule();
+    } else { // datasource: { name: '@foo/bar', updateFrequency: '*/5 * * * * *' }
+      const { name, ...options } = dataSource;
+      const dataSourceModule = moduleLoader([name])[0].default;
+      dataSource = new dataSourceModule(options);
+    }
+    return dataSource as IDataSource;
   }
 }
