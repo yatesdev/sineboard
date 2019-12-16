@@ -1,4 +1,4 @@
-import { IDataSource } from './IDataSource';
+import { IDataSource, IDataSourceDefinition } from './IDataSource';
 import { IRenderer } from './IRenderer';
 
 export abstract class ITemplateV1 {
@@ -20,7 +20,7 @@ export abstract class ITemplateDefinition {
   height: number;
   posX: number;
   posY: number;
-  dataSource: IDataSource | string;
+  dataSource: IDataSourceDefinition | string;
   renderer: (() => void) | string;
   parent?: ITemplate;
   children?: Array<ITemplate | string>;
@@ -48,6 +48,6 @@ export abstract class ISchedule {
 // tslint:disable-next-line:max-classes-per-file
 export abstract class IPageDisplay {
   name: string;
-  template: ITemplate;
+  template: ITemplateDefinition | string;
   schedule: ISchedule;
 }

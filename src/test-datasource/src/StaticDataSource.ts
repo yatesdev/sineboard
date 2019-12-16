@@ -3,8 +3,8 @@ import { IDataSource } from '@yatesdev/sineboard-core';
 export default class StaticDataSource implements IDataSource {
   name = 'StaticDatasource';
   data: any;
-  updateFrequency: number;
-  options = {};
+  updateFrequency = '*/1 * * * * *';
+  options?: object;
 
   constructor(overrides?: IStaticDataSourceOptions) {
     if (overrides && overrides.options) {
@@ -22,5 +22,5 @@ export default class StaticDataSource implements IDataSource {
 
 interface IStaticDataSourceOptions {
   options?: object;
-  updateFrequency?: number;
+  updateFrequency?: string;
 }
