@@ -1,8 +1,6 @@
-import { CanvasWrapper } from './Canvas';
-
 export abstract class IRenderer {
   name: string;
-  render(canvas: CanvasWrapper, data: any) {}
+  render(canvas: import('../types/canvas').Canvas, data: any) {}
 }
 
 export interface IRendererDefinition {

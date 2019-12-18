@@ -1,4 +1,3 @@
-export * from './Canvas';
 export * from './Events';
 export * from './IDataSource';
 export * from './IPageDisplay';

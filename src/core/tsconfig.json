@@ -12,11 +12,10 @@
         "target": "es2017",
         "noImplicitAny": true,
         "typeRoots": [
-            "types",
             "node_modules/@types"
         ],
         "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
     },
     "include": [
         "src/**/*"
