@@ -7,6 +7,7 @@ export abstract class ITemplate {
   height: number;
   posX: number;
   posY: number;
+  canvas: import('../types/canvas').Canvas;
   dataSource: IDataSource;
   renderer: IRenderer;
   parent?: ITemplate;
