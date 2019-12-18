@@ -1,9 +1,11 @@
-import { Events, IDataSource, IPageDisplay, ITemplate, ITemplateDefinition, IDataSourceDefinition } from '@yatesdev/sineboard-core';
-import { ConnectionManager } from '../connection';
-import { flatten, moduleLoader } from '../util';
-
+import { Events, IPageDisplay, ITemplate } from '@yatesdev/sineboard-core';
 import { Canvas } from 'canvas';
-import { DataSourceManager } from 'datasource';
+
+import { ConnectionManager } from '../connection';
+import { DataSourceManager } from '../datasource';
+import { flatten } from '../util';
+
+import { TemplateFactory } from './TemplateFactory';
 
 export class TemplateInitializer {
   constructor(
@@ -37,7 +39,15 @@ export class TemplateInitializer {
     const configuration = JSON.parse(await this.connectionManager.redis.get(redisKey)) as IPageDisplay;
 
     // initialize template instances
-    const temp = this.initTemplate(configuration.template);
+    const temp = TemplateFactory(configuration.template);
+    const dataSourceUpdated = (template: ITemplate) => {
+      return () => {
+        console.log(template.name, template.dataSource.data);
+        if (template.renderer) {
+          template.renderer.render(template.canvas, template.dataSource.data);
+        }
+      };
+    };
 
     flatten(temp).map((template) => {
       console.log(template.dataSource);
@@ -46,40 +56,7 @@ export class TemplateInitializer {
         configuration.schedule.startDate,
         configuration.schedule.endDate,
         template.dataSource.updateFrequency,
-        () => {
-          console.log(template.name, template.dataSource.data);
-        });
+        dataSourceUpdated(template));
     });
-  }
-
-  private initTemplate(root: ITemplateDefinition | string): ITemplate {
-    if (typeof root === 'string') {
-      const templateModule = moduleLoader([root])[0].default;
-      root = new templateModule();
-      return this.initTemplate(root);
-    }
-    if (Array.isArray(root.children)) {
-      root.children.map((child) => {
-        const initializedChild = this.initTemplate(child);
-        initializedChild.parent = root as ITemplate;
-      });
-    }
-
-    root.dataSource = this.initDataSource(root.dataSource);
-
-    return root as ITemplate;
-  }
-
-  private initDataSource(dataSource: IDataSourceDefinition | string): IDataSource {
-    // datasource: '@foo/bar'
-    if (typeof dataSource === 'string') {
-      const dataSourceModule = moduleLoader([dataSource])[0].default;
-      dataSource = new dataSourceModule();
-    } else { // datasource: { name: '@foo/bar', updateFrequency: '*/5 * * * * *' }
-      const { name, ...options } = dataSource;
-      const dataSourceModule = moduleLoader([name])[0].default;
-      dataSource = new dataSourceModule(options);
-    }
-    return dataSource as IDataSource;
   }
 }
