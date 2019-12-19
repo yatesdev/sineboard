@@ -1,14 +1,15 @@
 import { IRenderer } from '@yatesdev/sineboard-core';
 import { Canvas } from '@yatesdev/sineboard-core/types/canvas';
-import * as fs from 'fs';
 
 export default class BlockRenderer implements IRenderer {
   name = 'BlockRenderer';
-  options?: IBlockRendererOptions;
+  options: IBlockRendererOptions = {
+    color: 'rgb(0,0,0)',
+  };
 
   constructor(overrides?: IBlockRendererOptions) {
     if (overrides) {
-      this.options = overrides;
+      Object.assign(this.options, overrides);
     }
   }
   render(canvas: Canvas, data: any): void {
@@ -24,11 +25,6 @@ export default class BlockRenderer implements IRenderer {
 
     const renderEnd = process.hrtime(renderStart);
     console.log('Execution time (render): %ds %dms', renderEnd[0], renderEnd[1] / 1000000);
-
-    const exportStream = canvas.createPNGStream();
-    const fileStream = fs.createWriteStream('./foo.png');
-    exportStream.pipe(fileStream);
-    fileStream.on('close', () => console.log('done'));
   }
 
 }
