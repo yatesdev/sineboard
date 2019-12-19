@@ -15,6 +15,7 @@ export const TemplateFactory = (root: ITemplateDefinition | string): ITemplate =
     root.children.map((child) => {
       const initializedChild = TemplateFactory(child);
       initializedChild.parent = root as ITemplate;
+      return initializedChild;
     });
   }
 

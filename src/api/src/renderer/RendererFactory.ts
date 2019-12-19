@@ -7,7 +7,6 @@ export const RendererFactory = (renderer: IRendererDefinition | string): IRender
     renderer = new rendererModule();
   } else {
     const { name, ...options } = renderer;
-    console.log(moduleLoader([name]));
     const rendererModule = moduleLoader([name])[0].default;
     renderer = new rendererModule(options);
   }

@@ -4,7 +4,7 @@ export default function flatten<T extends ITreeNode<T>>(obj: T | T[]): T[] {
     acc.push(value);
     if (value.children) {
       acc = acc.concat(flatten(value.children));
-      delete value.children;
+      // delete value.children;
     }
     return acc;
   }, [] as T[]);
