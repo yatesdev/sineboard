@@ -1,5 +1,5 @@
 {
-  "name": "@yatesdev/sineboard-datasource-static",
+  "name": "@yatesdev/sineboard-datasource-random8bit",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
