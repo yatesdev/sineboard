@@ -12,10 +12,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^12.12.21",
+    "@yatesdev/sineboard-core": "file:../../../core",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
-  },
-  "dependencies": {
-    "@yatesdev/sineboard-core": "file:../core"
   }
 }

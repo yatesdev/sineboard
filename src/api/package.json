@@ -13,7 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@yatesdev/sineboard-core": "file:../core",
-    "@yatesdev/sineboard-datasource-static": "file:../test-datasource",
+    "@yatesdev/sineboard-datasource-random8bit": "file:../lib/datasources/random8bit",
+    "@yatesdev/sineboard-renderer-block": "file:../lib/renderers/block",
     "canvas": "^2.6.0",
     "graceful-fs": "^4.2.2",
     "inversify": "^5.0.1",
