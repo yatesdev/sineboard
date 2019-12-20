@@ -14,7 +14,6 @@ export default class BlockRenderer implements IRenderer {
   }
   render(canvas: Canvas, data: any): void {
     const renderStart = process.hrtime();
-    // console.log(this.options, data);
     const context = canvas.getContext('2d');
 
     context.fillStyle = this.options.color;

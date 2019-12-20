@@ -23,7 +23,7 @@ export class DataSourceManager {
   }
 
   add(dataSource: IDataSource, startDate: string, endDate: string, updateFrequency: string | number, onFetch: () => void) {
-    const hashId = hash(dataSource.name, { 
+    const hashId = hash(dataSource.name, {
       excludeKeys: (key: string) => key !== 'name' && key !== 'options' && key !== 'updateFrequency' },
     );
     const job = this.scheduler.scheduleJob(
@@ -37,6 +37,5 @@ export class DataSourceManager {
         onFetch();
       });
     this.jobs.set(hashId, job);
-    console.log(this.jobs.entries());
   }
 }

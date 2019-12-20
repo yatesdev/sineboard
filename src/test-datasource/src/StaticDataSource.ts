@@ -16,7 +16,7 @@ export default class StaticDataSource implements IDataSource {
   }
 
   fetch() {
-    this.data = Math.floor(Math.random() * 100);
+    this.data = Math.floor(Math.random() * 255);
   }
 }
 

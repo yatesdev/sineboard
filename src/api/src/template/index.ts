@@ -1,7 +1,6 @@
 import { Events, IPageDisplay, ITemplate } from '@yatesdev/sineboard-core';
 import { Canvas } from 'canvas';
-import * as fs from 'fs';
-
+// import * as fs from 'fs';
 import { ConnectionManager } from '../connection';
 import { DataSourceManager } from '../datasource';
 import { flatten } from '../util';
@@ -45,18 +44,19 @@ export class TemplateInitializer {
     const dataSourceUpdated = (template: ITemplate) => {
       const templateCompositor = (t: ITemplate): Canvas => {
         if (Array.isArray(t.children)) {
+          const context = t.canvas.getContext('2d');
+
           t.children.forEach((child) => {
             templateCompositor(child);
 
-            const context = t.canvas.getContext('2d');
             context.drawImage(child.canvas, child.posX, child.posY);
           });
         }
         return t.canvas;
       };
 
-      return () => {
-        console.log(template.name, template.dataSource.data);
+      return async () => {
+        // console.log(template.name, template.dataSource.data);
         if (template.children) {
           template.children.forEach((child) => {
             dataSourceUpdated(child);
@@ -79,10 +79,19 @@ export class TemplateInitializer {
         const compositeEnd = process.hrtime(compositeStart);
         console.log('Execution time (composition): %ds %dms', compositeEnd[0], compositeEnd[1] / 1000000);
 
-        const exportStream = output.createPNGStream();
-        const fileStream = fs.createWriteStream('./foo.png');
-        exportStream.pipe(fileStream);
-        // fileStream.on('close', () => console.log('done'));
+        const exportBuffer = output.getContext('2d').getImageData(0, 0, output.width, output.height).data; // output.toBuffer('raw');
+        // strip the A from RGBA[]
+        const rgbExportBuffer = Buffer.from(new Uint8Array(exportBuffer.filter((_: any, index: number) => (index + 1) % 4)));
+
+        await this.connectionManager.redis.pipeline()
+          .setBuffer('exportTest', rgbExportBuffer)
+          .publish(Events.TemplateRendered, 'exportTest')
+          .exec();
+
+        // DEBUG ONLY
+        // const exportStream = output.createPNGStream();
+        // const fileStream = fs.createWriteStream('./foo.png');
+        // exportStream.pipe(fileStream);
       };
     };
 

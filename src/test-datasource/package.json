@@ -11,6 +11,7 @@
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^12.12.21",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
   },

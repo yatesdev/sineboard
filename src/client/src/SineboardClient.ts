@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import Redis from 'ioredis';
 import * as path from 'path';
+import { GpioMapping, LedMatrix, LedMatrixUtils, PixelMapperType } from 'rpi-led-matrix';
 
 import { Events } from '@yatesdev/sineboard-core';
 
@@ -29,12 +30,37 @@ export default class SineboardClient {
     this.templateListner = this.redis.duplicate();
     this.templateListner.subscribe(Events.TemplateRendered);
 
+    const matrixOptions = Object.assign(LedMatrix.defaultMatrixOptions(), {
+      rows: 32,
+      cols: 32,
+      chainLength: 4,
+      hardwareMapping: GpioMapping.AdafruitHat,
+      pixelMapperConfig: LedMatrixUtils.encodeMappers({ type: PixelMapperType.Rotate, angle: 180 }, { type: PixelMapperType.U }),
+      pwmLsbNanoseconds: 200,
+    });
+    const runtimeOptions = Object.assign(LedMatrix.defaultRuntimeOptions(), {
+      gpioSlowdown: 2,
+    });
+
+    const matrix = new LedMatrix(matrixOptions, runtimeOptions);
+    console.log(matrix.width(), matrix.height());
+
     this.templateListner.on('message', async (channel, key) => {
       const buffer = await this.redis.getBuffer(key);
-      console.log(buffer);
+      // force to length matrix is expecting not sure why its different atm
+      const pixelArray = buffer.slice(0, matrix.width() * matrix.height() * 3);
+      // handle case where not enough bytes to fill array (otherwise matrix throws a fit)
+      if (pixelArray.byteLength < matrix.width() * matrix.height() * 3) { return; }
+
+      matrix
+        .clear()
+        .brightness(100)
+        .drawBuffer(pixelArray)
+        .sync();
     });
     await this.addSelfToClientList();
     await this.loadTemplate();
+
   }
 
   private addSelfToClientList(): Promise<number> {
