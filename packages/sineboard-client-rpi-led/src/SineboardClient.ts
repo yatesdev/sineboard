@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import { GpioMapping, LedMatrix, LedMatrixUtils, PixelMapperType } from 'rpi-led-matrix';
 
 import { Events } from '@yatesdev/sineboard-core';
+import { Logger } from '@yatesdev/sineboard-log';
 
 export default class SineboardClient {
   config: IClientConfigurationOptions;
@@ -15,6 +16,7 @@ export default class SineboardClient {
     this.config.name = process.env.CLIENT_NAME || 'SineboardRpiClient';
     this.config.redis.host = process.env.REDIS_HOST || '127.0.0.1';
     this.config.redis.port = parseInt(process.env.REDIS_PORT, 10) || 6379;
+    Logger.debug(this.config);
   }
 
   async start() {
@@ -36,7 +38,7 @@ export default class SineboardClient {
     });
 
     const matrix = new LedMatrix(matrixOptions, runtimeOptions);
-    console.log(matrix.width(), matrix.height());
+    Logger.debug(matrix.width(), matrix.height());
 
     this.templateListner.on('message', async (channel, key) => {
       const buffer = await this.redis.getBuffer(key);

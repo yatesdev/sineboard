@@ -1,4 +1,5 @@
 import { Events, IPageDisplay, ITemplate } from '@yatesdev/sineboard-core';
+import { Logger } from '@yatesdev/sineboard-log';
 import { Canvas } from 'canvas';
 // import * as fs from 'fs';
 import { ConnectionManager } from '../connection';
@@ -77,7 +78,7 @@ export class TemplateInitializer {
         const compositeStart = process.hrtime();
         const output = templateCompositor(rootNode);
         const compositeEnd = process.hrtime(compositeStart);
-        console.log('Execution time (composition): %ds %dms', compositeEnd[0], compositeEnd[1] / 1000000);
+        Logger.info('Execution time (composition): %ds %dms', compositeEnd[0], compositeEnd[1] / 1000000);
 
         const exportBuffer = output.getContext('2d').getImageData(0, 0, output.width, output.height).data; // output.toBuffer('raw');
         // strip the A from RGBA[]

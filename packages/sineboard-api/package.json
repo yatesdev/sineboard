@@ -14,6 +14,7 @@
   "dependencies": {
     "@yatesdev/sineboard-core": "^1.0.0",
     "@yatesdev/sineboard-datasource-random8bit": "^1.0.0",
+    "@yatesdev/sineboard-log": "^1.0.0",
     "@yatesdev/sineboard-renderer-block": "^1.0.0",
     "canvas": "^2.6.0",
     "graceful-fs": "^4.2.2",
