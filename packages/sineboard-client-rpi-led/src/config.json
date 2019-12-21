@@ -1,0 +1,54 @@
+{
+  "name": "Home Travel Time",
+  "template": {
+    "name": "Home Travel Time",
+    "posX": 0,
+    "posY": 0,
+    "width": 64,
+    "height": 64,
+    "parent": null,
+    "dataSource": {
+      "name": "@yatesdev/sineboard-datasource-random8bit",
+      "updateFrequency": "*/10 * * * * *"
+    },
+    "renderer": {
+      "name": "@yatesdev/sineboard-renderer-block",
+      "color": "rgb(255,255,255)"
+    },
+    "children": [
+      {
+        "name": "Time Home Label",
+        "posX": 0,
+        "posY": 0,
+        "width": 25,
+        "height": 8,
+        "dataSource": {
+          "name": "@yatesdev/sineboard-datasource-random8bit",
+          "updateFrequency": "*/30 * * * * *"
+        },
+        "renderer": {
+          "name": "@yatesdev/sineboard-renderer-block",
+          "color": "rgb(0,0,0)"
+        },
+        "children": [
+          {
+            "name": "Text Display",
+            "posX": 10,
+            "posY": 10,
+            "width": 32,
+            "height": 32,
+            "dataSource": {
+              "name": "@yatesdev/sineboard-datasource-random8bit",
+              "updateFrequency": "*/20 * * * * *"
+            },
+            "renderer": "@yatesdev/sineboard-renderer-text"
+          }
+        ]
+      }
+    ]
+  },
+  "schedule": {
+    "startDate": "* * 8,9,10,17 ? * SUN,MON,TUE,WED,THU *",
+    "endDate": "* * 8,9,10,17 ? * SUN,MON,TUE,WED,THU *"
+  }
+}
