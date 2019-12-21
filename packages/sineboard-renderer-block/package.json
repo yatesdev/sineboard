@@ -10,6 +10,9 @@
   },
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
+  "dependencies": {
+    "@yatesdev/sineboard-log": "^1.0.0"
+  },
   "devDependencies": {
     "@types/node": "^12.12.21",
     "@yatesdev/sineboard-core": "^1.0.0",

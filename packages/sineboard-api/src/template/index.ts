@@ -78,7 +78,7 @@ export class TemplateInitializer {
         const compositeStart = process.hrtime();
         const output = templateCompositor(rootNode);
         const compositeEnd = process.hrtime(compositeStart);
-        Logger.info('Execution time (composition): %ds %dms', compositeEnd[0], compositeEnd[1] / 1000000);
+        Logger.info(`Execution time (composition): ${compositeEnd[0]}s ${compositeEnd[1] / 1000000}ms`);
 
         const exportBuffer = output.getContext('2d').getImageData(0, 0, output.width, output.height).data; // output.toBuffer('raw');
         // strip the A from RGBA[]

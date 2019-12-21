@@ -1,5 +1,6 @@
 import { IRenderer } from '@yatesdev/sineboard-core';
 import { Canvas } from '@yatesdev/sineboard-core/types/canvas';
+import { Logger } from '@yatesdev/sineboard-log';
 
 export default class BlockRenderer implements IRenderer {
   name = 'BlockRenderer';
@@ -23,7 +24,7 @@ export default class BlockRenderer implements IRenderer {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     const renderEnd = process.hrtime(renderStart);
-    console.log('Execution time (render): %ds %dms', renderEnd[0], renderEnd[1] / 1000000);
+    Logger.info(`Execution time (render): ${renderEnd[0]}s ${renderEnd[1] / 1000000}ms`);
   }
 
 }
