@@ -1,6 +1,6 @@
-import * as fs from 'graceful-fs';
+import { readdirSync } from 'fs';
 import { isObject, isString } from 'lodash';
-import * as path from 'path';
+import { join, normalize } from 'path';
 
 const IGNORED_PACKAGES: string[] = [];
 
@@ -29,11 +29,11 @@ export default function resolve(plugins: string[], emitter?: any) {
         return;
       }
       // console.log(__dirname);
-      const pluginDirectory = path.normalize(path.join(__dirname, '/../..'));
+      const pluginDirectory = normalize(join(__dirname, '/../..'));
       const regexp = new RegExp(`^${plugin.replace('*', '.*')}`);
 
       console.log(`Loading ${plugin} from ${pluginDirectory}`);
-      fs.readdirSync(pluginDirectory)
+      readdirSync(pluginDirectory)
         .filter((pluginName: string) => !IGNORED_PACKAGES.includes(pluginName) && regexp.test(pluginName))
         .forEach((pluginName: string) => requirePlugin(`${pluginDirectory}/${pluginName}`));
     } else if (isObject(plugin)) {
