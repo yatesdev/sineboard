@@ -8,11 +8,12 @@ export default class BlockRenderer implements IRenderer {
     color: 'rgb(0,0,0)',
   };
 
-  constructor(overrides?: IBlockRendererOptions) {
+  constructor(overrides?: Partial<IBlockRendererOptions>) {
     if (overrides) {
       Object.assign(this.options, overrides);
     }
   }
+
   render(canvas: Canvas, data: any): void {
     const renderStart = process.hrtime();
     const context = canvas.getContext('2d');
