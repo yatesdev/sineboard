@@ -1,3 +1,4 @@
+import { Logger } from '@yatesdev/sineboard-log';
 import { readdirSync } from 'fs';
 import { isObject, isString } from 'lodash';
 import { join, normalize } from 'path';
@@ -16,9 +17,8 @@ export default function resolve(plugins: string[], emitter?: any) {
       if (e.code === 'MODULE_NOT_FOUND' && e.message.includes(name)) {
         console.error(`Cannot find plugin "${name}".\n  Did you forget to install it?\n  npm install ${name} --save`);
       } else {
-        // log.error(`Error during loading "${name}" plugin:\n  ${e.message}`)
+        Logger.error(`Error during loading "${name}" plugin:\n  ${e.message}`);
       }
-      // emitter.emit('load_error', 'plug_in', name);
     }
   }
 

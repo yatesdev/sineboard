@@ -1,4 +1,7 @@
 import { ITemplate, ITemplateDefinition } from '@yatesdev/sineboard-core';
+import { ErrorDataSource } from '@yatesdev/sineboard-datasource-error';
+import { Logger } from '@yatesdev/sineboard-log';
+import { ErrorRenderer } from '@yatesdev/sineboard-renderer-error';
 import { Canvas } from 'canvas';
 
 import { DataSourceFactory } from '../datasource';
@@ -20,9 +23,14 @@ export const TemplateFactory = (root: ITemplateDefinition | string): ITemplate =
   }
 
   (root as ITemplate).canvas = new Canvas(root.width, root.height);
-  root.dataSource = DataSourceFactory(root.dataSource);
-  if (root.renderer) {
+
+  try {
+    root.dataSource = DataSourceFactory(root.dataSource);
     root.renderer = RendererFactory(root.renderer);
+  } catch (error) {
+    Logger.error(`Failed to initialize ${root.dataSource.toString()}: ${error}`);
+    root.dataSource = new ErrorDataSource(error);
+    root.renderer = new ErrorRenderer();
   }
 
   return root as ITemplate;

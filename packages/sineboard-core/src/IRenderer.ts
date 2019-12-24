@@ -2,7 +2,7 @@ export abstract class IRenderer {
   name: string;
   options?: object;
 
-  render(canvas: import('../types/canvas').Canvas, data: any) {}
+  abstract render(canvas: import('../types/canvas').Canvas, data: any): void;
 }
 
 export interface IRendererDefinition {
