@@ -1,0 +1,23 @@
+{
+  "name": "@yatesdev/sineboard-log",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "Mike Yates <mike@yatesdev.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "dist/logger.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint --project .",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "winston": "3.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.21",
+    "@types/winston": "^2.4.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  }
+}

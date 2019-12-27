@@ -1,0 +1,22 @@
+{
+  "name": "@yatesdev/sineboard-datasource-static",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint --project .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mike Yates <mike@yatesdev.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.12.21",
+    "@yatesdev/sineboard-core": "^1.0.0",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  },
+  "peerDependencies": {
+    "@yatesdev/sineboard-api": "^1.0.0"
+  }
+}
