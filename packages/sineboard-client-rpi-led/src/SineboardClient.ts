@@ -12,7 +12,7 @@ export default class SineboardClient {
   templateListner: Redis.Redis;
 
   constructor() {
-    this.config = {} as IClientConfigurationOptions;
+    this.config = { redis: {} } as IClientConfigurationOptions;
     this.config.name = process.env.CLIENT_NAME || 'SineboardRpiClient';
     this.config.redis.host = process.env.REDIS_HOST || '127.0.0.1';
     this.config.redis.port = parseInt(process.env.REDIS_PORT, 10) || 6379;
