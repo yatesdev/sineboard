@@ -1,0 +1,62 @@
+{
+  "name": "Home Travel Time",
+  "template": {
+    "name": "Home Travel Time Page",
+    "posX": 0,
+    "posY": 0,
+    "width": 64,
+    "height": 64,
+    "parent": null,
+    "dataSource": {
+      "name": "@yatesdev/sineboard-datasource-static"
+    },
+    "renderer": {
+      "name": "@yatesdev/sineboard-renderer-block",
+      "borderSize": 1
+    },
+    "children": [
+      {
+        "name": "Time Home Label",
+        "posX": 0,
+        "posY": 0,
+        "width": 38,
+        "height": 15,
+        "dataSource": "@yatesdev/sineboard-datasource-static",
+        "renderer": {
+          "name": "@yatesdev/sineboard-renderer-block",
+          "borderSize": 1
+        },
+        "children": [
+          {
+            "name": "Label",
+            "posX": 2,
+            "posY": 2,
+            "width": 38,
+            "height": 6,
+            "dataSource": {
+              "name": "@yatesdev/sineboard-datasource-static",
+              "data": "Commute"
+            },
+            "renderer": "@yatesdev/sineboard-renderer-text"
+          },
+          {
+            "name": "Text Display",
+            "posX": 2,
+            "posY": 8,
+            "width": 32,
+            "height": 6,
+            "dataSource": {
+              "name": "@yatesdev/sineboard-datasource-random8bit",
+              "updateFrequency": "*/20 * * * * *"
+            },
+            "renderer": "@yatesdev/sineboard-renderer-text"
+          }
+        ]
+      }
+    ]
+  },
+  "schedule": {
+    "startDate": "* * 8,9,10,17 ? * SUN,MON,TUE,WED,THU *",
+    "endDate": "* * 8,9,10,17 ? * SUN,MON,TUE,WED,THU *"
+  }
+}
