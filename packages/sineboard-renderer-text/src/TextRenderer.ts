@@ -5,7 +5,9 @@ import { Logger } from '@yatesdev/sineboard-log';
 export default class TextRenderer implements IRenderer {
   name = 'TextRenderer';
   options: ITextRendererOptions = {
-    color: 'rgb(0,0,0)',
+    color: 'rgb(255,255,255)',
+    font: 'mono',
+    fontSize: 5,
   };
 
   constructor(overrides?: Partial<ITextRendererOptions>) {
@@ -13,15 +15,15 @@ export default class TextRenderer implements IRenderer {
   }
 
   render(canvas: Canvas, data: any): void {
-    // registerFont('../assets/4x5 mono.ttf', { family: 'mono' });
-
-    // canvas = new Canvas(canvas.width, canvas.height);
     const renderStart = process.hrtime();
     const context = canvas.getContext('2d');
+
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle =  'rgb(255,255,255)';
-    context.font = '8px arial';
+    context.fillStyle =  this.options.color;
+    context.font = `${this.options.fontSize}px ${this.options.font}`;
+    context.antialias = 'none';
     context.textBaseline = 'top';
+
     context.fillText(data, 0, 0);
 
     const renderEnd = process.hrtime(renderStart);
@@ -32,4 +34,6 @@ export default class TextRenderer implements IRenderer {
 
 interface ITextRendererOptions {
   color: string;
+  font: string;
+  fontSize: number;
 }
