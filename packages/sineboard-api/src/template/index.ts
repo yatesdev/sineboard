@@ -3,6 +3,7 @@ import { Logger } from '@yatesdev/sineboard-log';
 import { Canvas } from 'canvas';
 
 import * as fs from 'fs';
+import * as path from 'path';
 
 import { ConnectionManager } from '../connection';
 import { DataSourceManager } from '../datasource';
@@ -33,7 +34,6 @@ export class TemplateInitializer {
 
     // initialize template instances
     const temp = TemplateFactory(configuration.template);
-
 
     const dataSourceUpdated = (template: ITemplate) => {
       return async () => {
@@ -71,9 +71,10 @@ export class TemplateInitializer {
           .exec();
 
         // DEBUG ONLY
-        // const exportStream = output.createPNGStream();
-        // const fileStream = fs.createWriteStream('./foo.png');
-        // exportStream.pipe(fileStream);
+        const exportStream = output.createPNGStream();
+        const debugPath = path.resolve(process.cwd(), './debug', 'foo.png');
+        const fileStream = fs.createWriteStream(debugPath);
+        exportStream.pipe(fileStream);
       };
     };
 
