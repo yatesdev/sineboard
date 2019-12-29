@@ -19,7 +19,7 @@ export default class DriveTimeDataSource implements IDataSource {
     }
 
     this.googleClient = createClient({
-      key: process.env.GOOGLE_API_KEY || 'AIzaSyBdGRCC8NMdhAF2kSMYEJ6uN2cFwuTb-6k',
+      key: process.env.GOOGLE_API_KEY,
     });
 
     if (!overrides) { return; }
