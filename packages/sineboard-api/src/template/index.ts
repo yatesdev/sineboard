@@ -79,6 +79,12 @@ export class TemplateInitializer {
     };
 
     flatten(temp).map((template) => {
+      // Immediately trigger render for static datasources
+      if (!template.dataSource.updateFrequency) {
+        dataSourceUpdated(template)();
+        return;
+      }
+
       this.dataSourceManager.add(
         template.dataSource,
         configuration.schedule.startDate,
