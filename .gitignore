@@ -1,5 +1,6 @@
 dist/
 debug/
+**/config.json
 
 # Logs
 logs
