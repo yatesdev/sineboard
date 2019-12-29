@@ -10,12 +10,12 @@ export default function resolve(plugins: string[], emitter?: any) {
   // console.log(plugins);
 
   function requirePlugin(name: string) {
-    console.log(name);
+    Logger.debug(name);
     try {
       modules.push(require(name));
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND' && e.message.includes(name)) {
-        console.error(`Cannot find plugin "${name}".\n  Did you forget to install it?\n  npm install ${name} --save`);
+        Logger.error(`Cannot find plugin "${name}".\n  Did you forget to install it?\n  npm install ${name} --save`);
       } else {
         Logger.error(`Error during loading "${name}" plugin:\n  ${e.message}`);
       }
@@ -32,15 +32,15 @@ export default function resolve(plugins: string[], emitter?: any) {
       const pluginDirectory = normalize(join(__dirname, '/../..'));
       const regexp = new RegExp(`^${plugin.replace('*', '.*')}`);
 
-      console.log(`Loading ${plugin} from ${pluginDirectory}`);
+      Logger.info(`Loading ${plugin} from ${pluginDirectory}`);
       readdirSync(pluginDirectory)
         .filter((pluginName: string) => !IGNORED_PACKAGES.includes(pluginName) && regexp.test(pluginName))
         .forEach((pluginName: string) => requirePlugin(`${pluginDirectory}/${pluginName}`));
     } else if (isObject(plugin)) {
-      console.log(`Loading inlined plugin (defining ${Object.keys(plugin).join(', ')}).`);
+      Logger.info(`Loading inlined plugin (defining ${Object.keys(plugin).join(', ')}).`);
       modules.push(plugin);
     } else {
-      console.error(`Invalid plugin ${plugin}`);
+      Logger.error(`Invalid plugin ${plugin}`);
       // emitter.emit('load_error', 'plug_in', plugin);
     }
   });
