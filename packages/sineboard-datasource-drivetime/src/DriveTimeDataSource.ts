@@ -2,6 +2,7 @@ import { createClient, DirectionsRequest, GoogleMapsClient } from '@google/maps'
 import { IDataSource } from '@yatesdev/sineboard-core';
 import { Logger } from '@yatesdev/sineboard-log';
 import humanizeDuration from 'humanize-duration';
+import { promisify } from 'util';
 
 export default class DriveTimeDataSource implements IDataSource {
   name = 'DriveTimeDataSource';
@@ -27,20 +28,20 @@ export default class DriveTimeDataSource implements IDataSource {
     this.options.departure_time = 'now';
   }
 
-  fetch() {
-    // const { json: result } = await this.googleClient.directions(this.options).asPromise();
-    this.googleClient.directions(this.options, (err, response) => {
-      const routeDurations = response.json.routes.map((route) =>
+  async fetch() {
+    const getDirections = promisify(this.googleClient.directions);
+    const response = (await getDirections(this.options)).json;
+
+    const routeDurations = response.routes.map((route) =>
         route.legs.map((leg) =>
           leg.duration_in_traffic.value).reduce((runningSum, duration) =>
             runningSum + duration, 0));
 
-      const humanReadableDurations = routeDurations.map((durationInSeconds) =>
-        shortEnglishHumanizer(Math.round((durationInSeconds * 1000) / 60000) * 60000));
+    const humanReadableDurations = routeDurations.map((durationInSeconds) =>
+      shortEnglishHumanizer(Math.round((durationInSeconds * 1000) / 60000) * 60000));
 
-      console.log(routeDurations, humanReadableDurations);
-      this.data = humanReadableDurations[0];
-    });
+    Logger.silly(`Google DriveTime: ${routeDurations}, ${humanReadableDurations}`);
+    this.data = humanReadableDurations[0];
   }
 }
 
