@@ -1,3 +1,4 @@
+import { Canvas } from '../types/canvas';
 import { IDataSource, IDataSourceDefinition } from './IDataSource';
 import { IRenderer, IRendererDefinition } from './IRenderer';
 
@@ -7,7 +8,7 @@ export abstract class ITemplate {
   height: number;
   posX: number;
   posY: number;
-  canvas: import('../types/canvas').Canvas;
+  canvas: Canvas;
   dataSource: IDataSource;
   renderer: IRenderer;
   parent?: ITemplate;
