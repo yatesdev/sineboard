@@ -1,6 +1,6 @@
 {
   "name": "@yatesdev/sineboard-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
   "files": [
@@ -18,10 +18,10 @@
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
   "dependencies": {
-    "@yatesdev/sineboard-core": "~0",
-    "@yatesdev/sineboard-datasource-error": "~0",
-    "@yatesdev/sineboard-log": "~0",
-    "@yatesdev/sineboard-renderer-error": "~0",
+    "@yatesdev/sineboard-core": "^0.0.4",
+    "@yatesdev/sineboard-datasource-error": "^0.0.2",
+    "@yatesdev/sineboard-log": "^0.0.2",
+    "@yatesdev/sineboard-renderer-error": "^0.0.2",
     "canvas": "^2.6.0",
     "dotenv": "^8.2.0",
     "ioredis": "^4.14.1",

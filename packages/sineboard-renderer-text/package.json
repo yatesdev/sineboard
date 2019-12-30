@@ -1,6 +1,6 @@
 {
   "name": "@yatesdev/sineboard-renderer-text",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
   "files": [
@@ -21,11 +21,11 @@
     "@yatesdev/sineboard-api": "~0"
   },
   "dependencies": {
-    "@yatesdev/sineboard-log": "~0"
+    "@yatesdev/sineboard-log": "^0.0.2"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
-    "@yatesdev/sineboard-core": "~0",
+    "@yatesdev/sineboard-core": "^0.0.4",
     "copyfiles": "^2.1.1",
     "rimraf": "^3.0.0",
     "tslint": "^5.20.1",

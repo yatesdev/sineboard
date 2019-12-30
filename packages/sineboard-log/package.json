@@ -1,12 +1,14 @@
 {
   "name": "@yatesdev/sineboard-log",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Standardized logging across the Sineboard platform",
   "author": "Mike Yates <mike@yatesdev.com>",
   "homepage": "",
   "license": "ISC",
   "main": "dist/logger.js",
-  "files":["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "private": false,
   "scripts": {
     "build": "tsc",

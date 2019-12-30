@@ -1,6 +1,6 @@
 {
   "name": "@yatesdev/sineboard-datasource-drivetime",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
   "files": [
@@ -22,7 +22,7 @@
     "@types/humanize-duration": "^3.18.0",
     "@types/node": "^12.12.21",
     "@types/request": "^2.48.4",
-    "@yatesdev/sineboard-core": "~0",
+    "@yatesdev/sineboard-core": "^0.0.4",
     "rimraf": "^3.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@google/maps": "^1.0.2",
-    "@yatesdev/sineboard-log": "~0",
+    "@yatesdev/sineboard-log": "^0.0.2",
     "axios": "^0.19.0",
     "humanize-duration": "^3.21.0"
   },

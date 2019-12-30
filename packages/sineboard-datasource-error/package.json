@@ -1,6 +1,6 @@
 {
   "name": "@yatesdev/sineboard-datasource-error",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fallback datasource with error message for Sineboard",
   "main": "dist/index.js",
   "files": [
@@ -17,8 +17,8 @@
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
   "devDependencies": {
-    "@yatesdev/sineboard-core": "~0",
     "@types/node": "^12.12.21",
+    "@yatesdev/sineboard-core": "^0.0.4",
     "rimraf": "^3.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
