@@ -1,8 +1,9 @@
 {
   "name": "@yatesdev/sineboard-datasource-static",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
+  "private": false,
   "scripts": {
     "build": "tsc",
     "lint": "tslint --project .",
@@ -18,5 +19,6 @@
   },
   "peerDependencies": {
     "@yatesdev/sineboard-api": "^1.0.0"
-  }
+  },
+  "gitHead": "4f6d928eb3c9dc17ed5f651f9022eda7477c2b65"
 }
