@@ -3,25 +3,31 @@
   "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
   "private": false,
   "scripts": {
     "build": "npm run copy:assets && tsc",
+    "clean": "rimraf ./dist",
     "copy:assets": "copyfiles ./assets/* ./dist/",
     "lint": "tslint --project .",
+    "prepare": "npm run clean && npm run build -- --sourceMap false",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
   "peerDependencies": {
-    "@yatesdev/sineboard-api": "^1.0.0"
+    "@yatesdev/sineboard-api": "~0"
   },
   "dependencies": {
-    "@yatesdev/sineboard-core": "^1.0.0",
-    "@yatesdev/sineboard-log": "^1.0.0"
+    "@yatesdev/sineboard-log": "~0"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
+    "@yatesdev/sineboard-core": "~0",
     "copyfiles": "^2.1.1",
+    "rimraf": "^3.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
   },

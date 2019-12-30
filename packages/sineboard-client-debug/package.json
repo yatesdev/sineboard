@@ -3,24 +3,30 @@
   "version": "0.0.1",
   "description": "A limited sineboard client that only uploads its configuration.",
   "main": "dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
   "private": false,
   "scripts": {
     "build": "tsc",
+    "clean": "rimraf ./dist",
     "lint": "tslint --project .",
+    "prepare": "npm run clean && npm run build -- --sourceMap false",
     "start": "nodemon --watch src/**/* -e ts --exec ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
   "dependencies": {
-    "@yatesdev/sineboard-log": "^1.0.0",
+    "@yatesdev/sineboard-log": "~0",
     "dotenv": "^8.2.0",
     "ioredis": "^4.14.1"
   },
   "devDependencies": {
     "@types/ioredis": "^4.14.1",
-    "@yatesdev/sineboard-core": "^1.0.0",
+    "@yatesdev/sineboard-core": "~0",
     "nodemon": "^1.19.1",
+    "rimraf": "^3.0.0",
     "ts-node": "^8.3.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
