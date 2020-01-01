@@ -69,11 +69,9 @@ export class TemplateInitializer {
 
       // find rootNode to send to compositor
       let rootNode = template;
-      do {
-        if (rootNode.parent) {
-          rootNode = rootNode.parent;
-        }
-      } while (rootNode.parent);
+      while (rootNode.parent) {
+        rootNode = rootNode.parent;
+      }
 
       const compositeStart = process.hrtime();
       const output = TemplateCompositor(rootNode);
@@ -96,5 +94,5 @@ export class TemplateInitializer {
       const fileStream = fs.createWriteStream(debugPath);
       exportStream.pipe(fileStream);
     };
-  };
+  }
 }
