@@ -47,9 +47,8 @@ export class TemplateInitializer {
 
         this.dataSourceManager.add(
           template.dataSource,
-          page.schedule.startDate,
-          page.schedule.endDate,
-          template.dataSource.updateFrequency,
+          page.schedule,
+          template.name,
           this.dataSourceUpdated(template));
       });
     });

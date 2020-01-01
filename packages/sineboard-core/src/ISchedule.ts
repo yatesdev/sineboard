@@ -1,5 +1,5 @@
 export abstract class ISchedule {
-  startDate: string;
-  endDate: string;
+  start: string;
+  end: string;
   displayTime: number;
 }

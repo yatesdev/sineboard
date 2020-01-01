@@ -1,41 +1,69 @@
-import { Events, IDataSource } from '@yatesdev/sineboard-core';
-import Schedule from 'node-schedule'; // Need to figure out how to make this typeable or instanceable
+import { IDataSource, ISchedule } from '@yatesdev/sineboard-core';
+import { CronJob } from 'cron';
 import hash from 'object-hash';
 import { ConnectionManager } from '../connection';
 
 export class DataSourceManager {
-  jobs: Map<string, Schedule.Job>;
-  dataSources: IDataSource[];
-  scheduler: any; // technically the Schedule type
+  dataSourceJobs: Map<string, CronJob[]>;
+  scheduleJobs: Map<string, CronJob[]>;
 
   constructor(
     private readonly connectionManager: ConnectionManager,
   ) {
-    this.jobs = new Map();
-    this.dataSources = [];
-    this.scheduler = Schedule;
+    this.dataSourceJobs = new Map();
+    this.scheduleJobs = new Map();
   }
 
-  start() {
-    // this.connectionManager.channels.get(Events.ConfigurationLoaded).on('message', async (channel, key) => {
-    //   await this.connectionManager.redis.get(key);
-    // });
-  }
+  add(dataSource: IDataSource, schedule: ISchedule, templateName: string, onFetch: () => void) {
+    const scheduleKey = templateName + hash(schedule + templateName);
 
-  add(dataSource: IDataSource, startDate: string, endDate: string, updateFrequency: string | number, onFetch: () => void) {
-    const hashId = hash(dataSource.name, {
-      excludeKeys: (key: string) => key !== 'name' && key !== 'options' && key !== 'updateFrequency' },
-    );
-    const job = this.scheduler.scheduleJob(
-      hashId,
-      {
-        start: startDate,
-        end: endDate,
-        rule: updateFrequency,
-      }, async () => {
+    if (!this.scheduleJobs.has(scheduleKey)) {
+      const scheduleJobStart = new CronJob({
+        cronTime: schedule.start,
+        start: true,
+        onTick: () => {
+          const dataSourceJobs = this.dataSourceJobs.get(scheduleKey);
+          if (Array.isArray(dataSourceJobs)) {
+            dataSourceJobs.forEach((job) => {
+              if (!job.running) {
+                job.start();
+                job.fireOnTick();
+              }
+            });
+          }
+        },
+      });
+
+      const scheduleJobEnd = new CronJob({
+        cronTime: schedule.end,
+        start: true,
+        onTick: () => {
+          const dataSourceJobs = this.dataSourceJobs.get(scheduleKey);
+          if (Array.isArray(dataSourceJobs)) {
+            dataSourceJobs.forEach((job) => {
+              if (job.running) {
+                job.stop();
+              }
+            });
+          }
+        },
+      });
+      this.scheduleJobs.set(scheduleKey, [scheduleJobStart, scheduleJobEnd]);
+    }
+
+    if (!this.dataSourceJobs.has(scheduleKey)) {
+      this.dataSourceJobs.set(scheduleKey, []);
+    }
+
+    const dataSourceJob = new CronJob({
+      cronTime: dataSource.updateFrequency,
+      onTick: async () => {
         await dataSource.fetch();
         onFetch();
-      });
-    this.jobs.set(hashId, job);
+      },
+    });
+
+    const scheduledDataSourceJobs = this.dataSourceJobs.get(scheduleKey);
+    scheduledDataSourceJobs.push(dataSourceJob);
   }
 }
