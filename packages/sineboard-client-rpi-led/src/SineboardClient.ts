@@ -38,7 +38,7 @@ export default class SineboardClient {
     });
 
     const matrix = new LedMatrix(matrixOptions, runtimeOptions);
-    Logger.debug(matrix.width(), matrix.height());
+    Logger.debug(`Matrix Size: ${matrix.width()} x ${matrix.height()}`);
 
     this.templateListner.on('message', async (channel, key) => {
       const buffer = await this.redis.getBuffer(key);
