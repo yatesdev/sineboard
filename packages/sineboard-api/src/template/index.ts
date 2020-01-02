@@ -80,11 +80,12 @@ export class TemplateInitializer {
       const exportBuffer = output.getContext('2d').getImageData(0, 0, output.width, output.height).data; // output.toBuffer('raw');
 
       // strip the A from RGBA[] and convert Uint8ClampedArray to Uint8Array
+      // TODO: Migrate this to client side, as that would allow RGB matrix and canvas clients
       const rgbExportBuffer = Buffer.from(new Uint8Array(exportBuffer.filter((_: any, index: number) => (index + 1) % 4)));
 
       await this.connectionManager.redis.pipeline()
-        .setBuffer('exportTest', rgbExportBuffer)
-        .publish(Events.TemplateRendered, 'exportTest')
+        .setBuffer(`${rootNode.name}`, rgbExportBuffer)
+        .publish(Events.TemplateRendered, `${rootNode.name}`)
         .exec();
 
       // DEBUG ONLY
