@@ -12,7 +12,7 @@
     "build": "tsc --project .",
     "clean": "rimraf ./dist",
     "lint": "tslint --project .",
-    "prepare": "npm run clean && npm run build -- --sourceMap false",
+    "prepublishOnly": "npm run clean & npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Yates <mike@yatesdev.com>",

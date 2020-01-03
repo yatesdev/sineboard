@@ -8,11 +8,11 @@
   ],
   "private": false,
   "scripts": {
-    "build": "npm run copy:assets && tsc",
+    "build": "npm run copy:assets & tsc",
     "clean": "rimraf ./dist",
     "copy:assets": "copyfiles ./assets/* ./dist/",
     "lint": "tslint --project .",
-    "prepare": "npm run clean && npm run build -- --sourceMap false",
+    "prepublishOnly": "npm run clean & npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Yates <mike@yatesdev.com>",
@@ -21,11 +21,11 @@
     "@yatesdev/sineboard-api": "~0"
   },
   "dependencies": {
-    "@yatesdev/sineboard-log": "^0.0.2"
+    "@yatesdev/sineboard-log": "~0"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
-    "@yatesdev/sineboard-core": "^0.0.4",
+    "@yatesdev/sineboard-core": "~0",
     "copyfiles": "^2.1.1",
     "rimraf": "^3.0.0",
     "tslint": "^5.20.1",

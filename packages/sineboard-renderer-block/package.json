@@ -11,16 +11,16 @@
     "build": "tsc",
     "clean": "rimraf ./dist",
     "lint": "tslint --project .",
-    "prepare": "npm run clean && npm run build -- --sourceMap false",
+    "prepublishOnly": "npm run clean && npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
-  "peerDependencies": {
-    "@yatesdev/sineboard-api": "~0"
-  },
   "dependencies": {
     "@yatesdev/sineboard-log": "~0"
+  },
+  "peerDependencies": {
+    "@yatesdev/sineboard-api": "~0"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
