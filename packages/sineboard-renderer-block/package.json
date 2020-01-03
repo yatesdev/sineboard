@@ -20,11 +20,11 @@
     "@yatesdev/sineboard-api": "~0"
   },
   "dependencies": {
-    "@yatesdev/sineboard-log": "^0.0.2"
+    "@yatesdev/sineboard-log": "~0"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
-    "@yatesdev/sineboard-core": "^0.0.4",
+    "@yatesdev/sineboard-core": "~0",
     "rimraf": "^3.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
