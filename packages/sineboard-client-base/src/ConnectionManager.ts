@@ -27,11 +27,4 @@ export class ConnectionManager {
     this.channels.set(channelName, subscriber);
     return subscriber;
   }
-
-  subscribeToChannelPattern(channelPattern: string): Redis.Redis {
-    const subscriber = this.redis.duplicate();
-    subscriber.psubscribe(channelPattern);
-    this.channels.set(channelPattern, subscriber);
-    return subscriber;
-  }
 }
