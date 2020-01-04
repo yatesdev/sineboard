@@ -14,9 +14,13 @@ export abstract class SineboardClientBase {
   protected readonly transformers: Transformer[] = [];
 
   constructor(overrides?: Partial<IClientConfiguration>) {
-    this.clientConfig = config;
+    this.clientConfig = Object.assign(config, overrides);
     this.display = new DisplayManager();
     this.connection = new ConnectionManager(this.clientConfig.connection.redis);
+
+    this.clientConfig.template.forEach((displayTemplate) => {
+      this.display.set(displayTemplate, null);
+    });
   }
 
   get displayHeight() {
@@ -28,13 +32,21 @@ export abstract class SineboardClientBase {
   }
 
   async start() {
+    Logger.info(`Starting Client: ${this.clientConfig.metadata.name}...`);
     Logger.info('Connecting to Redis...');
-    await this.connection.subscribeToChannel(Events.TemplateRendered);
+    const conn = await this.connection.subscribeToChannelPattern(`${this.clientConfig.metadata.name}:*`);
+    conn.on('pmessage', (pattern: string, channel: string, message) => {
+      switch (channel.split(':').slice(-1)[0]) {
+        case Events.TemplateRendered:
+          this.onTemplateRendered(channel, message);
+          break;
+      }
+    });
 
-    this.connection.channels.get(Events.TemplateRendered).on('message', this.onTemplateRendered.bind(this));
-
+    Logger.info('Registering with Sineboard API...');
     await this.registerSelf();
 
+    Logger.info('Starting Display...');
     this.displayLoop();
   }
 
@@ -54,6 +66,7 @@ export abstract class SineboardClientBase {
   }
 
   private async registerSelf() {
+    // TODO: Extract and make less specific
     const exportConfig = Object.entries(this.clientConfig).reduce((acc, kv) => {
       if (kv[0] === 'connection') { return acc; } // can I use keyof in future?
       acc[kv[0]] = JSON.stringify(kv[1]);
@@ -74,7 +87,8 @@ export abstract class SineboardClientBase {
   }
 
   async onTemplateRendered(_: string, key: string) {
-    const template = this.display.getByTemplateName(key.split(':', 1)[1]);
+    // TODO: Figure out a better way to map the template to the rendered buffer
+    const template = this.display.getByTemplateName(key.split(':').splice(-1)[0]);
     if (!template) { return; }
 
     const buffer = await this.connection.redis.getBuffer(key);

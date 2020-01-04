@@ -15,7 +15,7 @@ export class SineboardDebugClient extends SineboardClientBase {
   }
 
   onDisplay(display: Buffer): void {
-    const imageData = createImageData(new Uint8ClampedArray(display), this.templateWidth, this.templateHeight);
+    const imageData = createImageData(new Uint8ClampedArray(display), this.displayWidth, this.displayHeight);
 
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.putImageData(imageData, 0, 0);

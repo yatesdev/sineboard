@@ -23,15 +23,12 @@ export class TemplateInitializer {
 
     // handle api reboot and pull existing client configuration
     const clientList = await this.connectionManager.redis.smembers('clients');
-    clientList.forEach((clientKey) => this.loadClientConfiguration(`template:${clientKey}`));
+    clientList.forEach((clientId) => this.loadClientConfiguration(`client:${clientId}`));
   }
 
-  private async loadClientConfiguration(redisKey: string) {
-    let configuration: IDisplayTemplate | IDisplayTemplate[] = JSON.parse(await this.connectionManager.redis.get(redisKey));
-
-    if (!Array.isArray(configuration)) {
-      configuration = [configuration];
-    }
+  private async loadClientConfiguration(clientHashKey: string) {
+    const metadata: any = JSON.parse(await this.connectionManager.redis.hget(clientHashKey, 'metadata'));
+    const configuration: IDisplayTemplate[] = JSON.parse(await this.connectionManager.redis.hget(clientHashKey, 'template'));
 
     configuration.forEach((page) => {
       const temp = TemplateFactory(page.template);
@@ -39,7 +36,7 @@ export class TemplateInitializer {
       flatten(temp).map((template) => {
         // Immediately trigger render for static datasources
         if (!template.dataSource.updateFrequency) {
-          this.dataSourceUpdated(template, page)();
+          this.dataSourceUpdated(template, page, metadata.name)();
           return;
         }
 
@@ -47,31 +44,25 @@ export class TemplateInitializer {
           template.dataSource,
           page.schedule,
           template.name,
-          this.dataSourceUpdated(template, page));
+          this.dataSourceUpdated(template, page, metadata.name));
       });
     });
   }
 
-  private dataSourceUpdated(template: ITemplate, page: IDisplayTemplate) {
+  private dataSourceUpdated(template: ITemplate, page: IDisplayTemplate, clientName: string) {
     return async () => {
       // console.log(template.name, template.dataSource.data);
       if (template.children) {
         template.children.forEach((child) => {
-          this.dataSourceUpdated(child, page);
+          this.dataSourceUpdated(child, page, clientName);
         });
       }
       if (template.renderer) {
         template.renderer.render(template.canvas, template.dataSource.data);
       }
 
-      // find rootNode to send to compositor
-      let rootNode = template;
-      while (rootNode.parent) {
-        rootNode = rootNode.parent;
-      }
-
       const compositeStart = process.hrtime();
-      const output = TemplateCompositor(rootNode);
+      const output = TemplateCompositor(page.template);
       const compositeEnd = process.hrtime(compositeStart);
       Logger.info(`Execution time (composition): ${compositeEnd[0]}s ${compositeEnd[1] / 1000000}ms`);
 
@@ -80,10 +71,10 @@ export class TemplateInitializer {
       // // strip the A from RGBA[] and convert Uint8ClampedArray to Uint8Array
       // // TODO: Migrate this to client side, as that would allow RGB matrix and canvas clients
       // const rgbExportBuffer = Buffer.from(new Uint8Array(exportBuffer.filter((_: any, index: number) => (index + 1) % 4)));
-      const exportKey = `rendered:${page.name}`;
+      const exportKey = `rendered:${clientName}:${page.name}`;
       await this.connectionManager.redis.pipeline()
         .setBuffer(exportKey, exportBuffer)
-        .publish(Events.TemplateRendered, exportKey)
+        .publish(`${clientName}:${Events.TemplateRendered}`, exportKey)
         .exec();
 
       // DEBUG ONLY

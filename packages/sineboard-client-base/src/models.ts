@@ -4,7 +4,7 @@ import { RedisOptions } from 'ioredis';
 export interface IClientConfiguration {
   metadata: IClientMetadata;
   connection: IClientConnectionConfiguration;
-  template: IDisplayTemplate | IDisplayTemplate[];
+  template: IDisplayTemplate[];
 }
 
 export type IClientConfigurationExport = Pick<IClientConfiguration, 'metadata' | 'template'>;

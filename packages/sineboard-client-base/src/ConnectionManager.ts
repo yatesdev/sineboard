@@ -4,12 +4,7 @@ export class ConnectionManager {
   private readonly _channels: Map<string, Redis.Redis>;
   private readonly _redis: Redis.Redis;
 
-  constructor(configOverrides?: RedisOptions) {
-    const config = Object.assign({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT, 10) || 6379,
-    }, configOverrides);
-
+  constructor(config: RedisOptions) {
     this._redis = new Redis(config);
     this._channels = new Map();
   }
@@ -25,6 +20,13 @@ export class ConnectionManager {
     const subscriber = this.redis.duplicate();
     await subscriber.subscribe(channelName);
     this.channels.set(channelName, subscriber);
+    return subscriber;
+  }
+
+  async subscribeToChannelPattern(channelPattern: string): Promise<Redis.Redis> {
+    const subscriber = this.redis.duplicate();
+    await subscriber.psubscribe(channelPattern);
+    this.channels.set(channelPattern, subscriber);
     return subscriber;
   }
 }
