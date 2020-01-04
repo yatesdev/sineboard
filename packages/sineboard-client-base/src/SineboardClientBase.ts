@@ -14,14 +14,19 @@ export abstract class SineboardClientBase {
   private readonly clientConfig: IClientConfigurationOptions;
   private readonly display: DisplayManager;
 
-  constructor(overrides?: IClientConfigurationOptions) {
-    const configPath = resolve(__dirname, './.env');
+  protected readonly transformers: Transformer[] = [];
+
+  constructor(overrides?: Partial<IClientConfigurationOptions>) {
+    const configPath = resolve(process.cwd(), './.env');
     config({path: configPath});
 
-    this.clientConfig = { redis: {} } as IClientConfigurationOptions;
-    this.clientConfig.name = process.env.CLIENT_NAME || 'SineboardClient';
-    this.clientConfig.redis.host = process.env.REDIS_HOST || '127.0.0.1';
-    this.clientConfig.redis.port = parseInt(process.env.REDIS_PORT, 10) || 6379;
+    this.clientConfig = {
+      name: process.env.CLIENT_NAME || 'SineboardClient',
+      redis: {
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+      },
+    };
 
     this.clientConfig = Object.assign(this.clientConfig, overrides);
     Logger.debug(this.clientConfig);
@@ -43,7 +48,7 @@ export abstract class SineboardClientBase {
 
   async start() {
     await this.connection.subscribeToChannel(Events.TemplateRendered);
-    this.connection.channels.get(Events.TemplateRendered).on('message', this.onTemplateRendered);
+    this.connection.channels.get(Events.TemplateRendered).on('message', this.onTemplateRendered.bind(this));
 
     await this.registerSelf();
 
@@ -78,7 +83,7 @@ export abstract class SineboardClientBase {
   }
 
   private loadTemplate(path = './config.json'): string {
-    const configPath = resolve(__dirname, path);
+    const configPath = resolve(process.cwd(), path);
     const rawConfig = readFileSync(configPath);
     let parsedConfig = JSON.parse(rawConfig.toString()) as IPageDisplay | IPageDisplay[];
 
@@ -97,20 +102,32 @@ export abstract class SineboardClientBase {
     if (!template) { return; }
 
     const buffer = await this.connection.redis.getBuffer(key);
-    // transormation pipeline (buffer)
 
-    this.display.set(template.template, buffer);
+    let outputBuffer = buffer;
+    if (this.transformers.length > 0) {
+      outputBuffer = pipe<any, Buffer>(...(this.transformers) as [Transformer, Transformer])(buffer);
+    }
+
+    this.display.set(template.template, outputBuffer);
   }
 
-  // /**
-  //  * Transformation pipeline to help manipulate the rendered template into a format suitable for the client
-  //  */
-  // abstract transforms<T extends any[], R>( fn1: (...args: T) => R, ...fns: Array<(a: R) => R>): T;
   abstract onDisplay(display: any): void;
   abstract onEmptyDisplay(): void;
 }
 
-export interface IClientConfigurationOptions {
+type Transformer = (args: Buffer, ...rest: any) => Buffer;
+interface IClientConfigurationOptions {
   name: string;
   redis: RedisOptions;
 }
+
+const pipe = <T extends any[], R>(
+  fn1: (...args: T) => R,
+  ...fns: Array<(a: R) => R>
+) => {
+  const piped = fns.reduce(
+    (prevFn, nextFn) => (value: R) => nextFn(prevFn(value)),
+    (value) => value,
+  );
+  return (...args: T) => piped(fn1(...args));
+};
