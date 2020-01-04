@@ -11,15 +11,24 @@ export class DisplayManager {
     this._display = this.displayGenerator();
   }
 
+  get maxHeight() {
+    return Math.max(...Array.from(this._store.keys()).map((page) => page.template.height));
+  }
+
+  get maxWidth() {
+    return Math.max(...Array.from(this._store.keys()).map((page) => page.template.width));
+  }
+
   next() {
     return this._display.next();
   }
 
   any(): boolean {
-    return this._store.size > 0;
+    return this._store.size > 0 &&
+      Array.from(this._store.values()).some((x) => x !== null);
   }
 
-  set(screen: IPageDisplay, buffer: Buffer = null) {
+  set(screen: IPageDisplay, buffer: Buffer = null): void {
     this._store.set(screen, buffer);
     this._nameIndex.set(screen.name, screen);
   }

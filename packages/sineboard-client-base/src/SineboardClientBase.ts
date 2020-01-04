@@ -33,6 +33,14 @@ export abstract class SineboardClientBase {
     this.display = new DisplayManager();
   }
 
+  get templateHeight() {
+    return this.display.maxHeight;
+  }
+
+  get templateWidth() {
+    return this.display.maxWidth;
+  }
+
   async start() {
     await this.connection.subscribeToChannel(Events.TemplateRendered);
     this.connection.channels.get(Events.TemplateRendered).on('message', this.onTemplateRendered);
