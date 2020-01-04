@@ -18,7 +18,9 @@
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
   "dependencies": {
+    "@yatesdev/sineboard-client-base": "~0",
     "@yatesdev/sineboard-log": "~0",
+    "canvas": "^2.6.0",
     "dotenv": "^8.2.0",
     "ioredis": "^4.14.1"
   },

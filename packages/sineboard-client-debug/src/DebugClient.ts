@@ -1,52 +1,40 @@
-import { readFileSync } from 'fs';
-import Redis, { RedisOptions } from 'ioredis';
-import { resolve } from 'path';
+import { Canvas, createCanvas, createImageData } from 'canvas';
+import fs from 'fs';
+import path from 'path';
 
-import { Events } from '@yatesdev/sineboard-core';
-import { Logger } from '@yatesdev/sineboard-log';
+import { SineboardClientBase } from '@yatesdev/sineboard-client-base';
 
-export default class DebugClient {
-  config: IClientConfigurationOptions;
-  redis: Redis.Redis;
-  templateListner: Redis.Redis;
+export class SineboardDebugClient extends SineboardClientBase {
+  private readonly canvas: Canvas;
+  private readonly context: CanvasRenderingContext2D;
 
   constructor() {
-    this.config = { redis: {} } as IClientConfigurationOptions;
-    this.config.name = process.env.CLIENT_NAME || 'SineboardRpiClient';
-    this.config.redis.host = process.env.REDIS_HOST || '127.0.0.1';
-    this.config.redis.port = parseInt(process.env.REDIS_PORT, 10) || 6379;
-    Logger.debug(this.config);
+    super();
+    this.canvas = createCanvas(100, 100);
+    this.context = this.canvas.getContext('2d');
   }
 
-  async start() {
-    this.redis = new Redis(this.config.redis);
+  onDisplay(display: Buffer): void {
+    const imageData = createImageData(new Uint8ClampedArray(display), this.templateWidth, this.templateHeight);
 
-    this.templateListner = this.redis.duplicate();
-    this.templateListner.subscribe(Events.TemplateRendered);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.putImageData(imageData, 0, 0);
 
-    await this.addSelfToClientList();
-    await this.loadTemplate();
+    this.outputToFile();
   }
 
-  private addSelfToClientList(): Promise<number> {
-    const result = this.redis.sadd('clients', this.config.name);
-    return result;
+  onEmptyDisplay(): void {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.fillStyle = 'rgb(200,200,200)';
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.outputToFile();
   }
 
-  private async loadTemplate(): Promise<void> {
-    const templateKey = `template:${this.config.name}`;
-
-    const configPath = resolve(__dirname, './config.json');
-    const rawConfig = readFileSync(configPath);
-    const config = JSON.parse(rawConfig.toString());
-    await this.redis.pipeline()
-      .set(templateKey, JSON.stringify(config))
-      .publish(Events.ConfigurationLoaded, templateKey) // does this make sense or does it make more sense to just send the template?
-      .exec();
+  private outputToFile() {
+    const exportStream = this.canvas.createPNGStream();
+    const debugPath = path.resolve(process.cwd(), './debug', 'foo.png');
+    const fileStream = fs.createWriteStream(debugPath);
+    exportStream.pipe(fileStream);
   }
-}
-
-export interface IClientConfigurationOptions {
-  name: string;
-  redis: RedisOptions;
 }
