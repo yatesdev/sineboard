@@ -1,4 +1,4 @@
-import { Events, IPageDisplay, ITemplate } from '@yatesdev/sineboard-core';
+import { Events, IDisplayTemplate, ITemplate } from '@yatesdev/sineboard-core';
 import { Logger } from '@yatesdev/sineboard-log';
 
 import * as fs from 'fs';
@@ -27,7 +27,7 @@ export class TemplateInitializer {
   }
 
   private async loadClientConfiguration(redisKey: string) {
-    let configuration: IPageDisplay | IPageDisplay[] = JSON.parse(await this.connectionManager.redis.get(redisKey));
+    let configuration: IDisplayTemplate | IDisplayTemplate[] = JSON.parse(await this.connectionManager.redis.get(redisKey));
 
     if (!Array.isArray(configuration)) {
       configuration = [configuration];
@@ -52,7 +52,7 @@ export class TemplateInitializer {
     });
   }
 
-  private dataSourceUpdated(template: ITemplate, page: IPageDisplay) {
+  private dataSourceUpdated(template: ITemplate, page: IDisplayTemplate) {
     return async () => {
       // console.log(template.name, template.dataSource.data);
       if (template.children) {

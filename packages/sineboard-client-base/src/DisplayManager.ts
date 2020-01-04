@@ -1,9 +1,9 @@
-import { IPageDisplay } from '@yatesdev/sineboard-core';
+import { IDisplayTemplate } from '@yatesdev/sineboard-core';
 
 export class DisplayManager {
-  private readonly _display: Generator<{ page: IPageDisplay; buffer: Buffer; }, never, never>;
-  private readonly _store: Map<IPageDisplay, Buffer>;
-  private readonly _nameIndex: Map<string, IPageDisplay>;
+  private readonly _display: Generator<{ page: IDisplayTemplate; buffer: Buffer; }, never, never>;
+  private readonly _store: Map<IDisplayTemplate, Buffer>;
+  private readonly _nameIndex: Map<string, IDisplayTemplate>;
 
   constructor() {
     this._store = new Map();
@@ -28,7 +28,7 @@ export class DisplayManager {
       Array.from(this._store.values()).some((x) => x !== null);
   }
 
-  set(screen: IPageDisplay, buffer: Buffer = null): void {
+  set(screen: IDisplayTemplate, buffer: Buffer = null): void {
     this._store.set(screen, buffer);
     this._nameIndex.set(screen.name, screen);
   }
@@ -46,7 +46,7 @@ export class DisplayManager {
   /**
    * Infinitely loops over rendered display screens
    */
-  private *displayGenerator(): Generator<{ page: IPageDisplay; buffer: Buffer; }, never, never> {
+  private *displayGenerator(): Generator<{ page: IDisplayTemplate; buffer: Buffer; }, never, never> {
     let screens = this._store.entries();
     while (true) {
       const nextScreen = screens.next();
