@@ -98,7 +98,7 @@ export abstract class SineboardClientBase {
   }
 
   async onTemplateRendered(_: string, key: string) {
-    const template = this.display.getByTemplateName(key);
+    const template = this.display.getByTemplateName(key.split(':', 1)[1]);
     if (!template) { return; }
 
     const buffer = await this.connection.redis.getBuffer(key);

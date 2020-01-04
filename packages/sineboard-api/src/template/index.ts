@@ -19,9 +19,7 @@ export class TemplateInitializer {
 
   async start() {
     this.connectionManager.subscribeToChannel(Events.ConfigurationLoaded);
-    this.connectionManager.channels.get(Events.ConfigurationLoaded).on('message', (channel, configurationKey) => {
-      this.loadClientConfiguration(configurationKey);
-    });
+    this.connectionManager.channels.get(Events.ConfigurationLoaded).on('message', (_, key) => this.loadClientConfiguration(key));
 
     // handle api reboot and pull existing client configuration
     const clientList = await this.connectionManager.redis.smembers('clients');
@@ -41,7 +39,7 @@ export class TemplateInitializer {
       flatten(temp).map((template) => {
         // Immediately trigger render for static datasources
         if (!template.dataSource.updateFrequency) {
-          this.dataSourceUpdated(template)();
+          this.dataSourceUpdated(template, page)();
           return;
         }
 
@@ -49,17 +47,17 @@ export class TemplateInitializer {
           template.dataSource,
           page.schedule,
           template.name,
-          this.dataSourceUpdated(template));
+          this.dataSourceUpdated(template, page));
       });
     });
   }
 
-  private dataSourceUpdated(template: ITemplate) {
+  private dataSourceUpdated(template: ITemplate, page: IPageDisplay) {
     return async () => {
       // console.log(template.name, template.dataSource.data);
       if (template.children) {
         template.children.forEach((child) => {
-          this.dataSourceUpdated(child);
+          this.dataSourceUpdated(child, page);
         });
       }
       if (template.renderer) {
@@ -77,15 +75,15 @@ export class TemplateInitializer {
       const compositeEnd = process.hrtime(compositeStart);
       Logger.info(`Execution time (composition): ${compositeEnd[0]}s ${compositeEnd[1] / 1000000}ms`);
 
-      const exportBuffer = output.getContext('2d').getImageData(0, 0, output.width, output.height).data; // output.toBuffer('raw');
+      const exportBuffer = Buffer.from(output.getContext('2d').getImageData(0, 0, output.width, output.height).data);
 
-      // strip the A from RGBA[] and convert Uint8ClampedArray to Uint8Array
-      // TODO: Migrate this to client side, as that would allow RGB matrix and canvas clients
-      const rgbExportBuffer = Buffer.from(new Uint8Array(exportBuffer.filter((_: any, index: number) => (index + 1) % 4)));
-
+      // // strip the A from RGBA[] and convert Uint8ClampedArray to Uint8Array
+      // // TODO: Migrate this to client side, as that would allow RGB matrix and canvas clients
+      // const rgbExportBuffer = Buffer.from(new Uint8Array(exportBuffer.filter((_: any, index: number) => (index + 1) % 4)));
+      const exportKey = `rendered:${page.name}`;
       await this.connectionManager.redis.pipeline()
-        .setBuffer(`${rootNode.name}`, rgbExportBuffer)
-        .publish(Events.TemplateRendered, `${rootNode.name}`)
+        .setBuffer(exportKey, exportBuffer)
+        .publish(Events.TemplateRendered, exportKey)
         .exec();
 
       // DEBUG ONLY
