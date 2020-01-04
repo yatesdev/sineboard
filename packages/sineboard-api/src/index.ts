@@ -5,7 +5,7 @@ import { ConnectionManager } from './connection';
 import { DataSourceManager } from './datasource';
 import { TemplateInitializer } from './template';
 
-const configPath = resolve(__dirname, './.env');
+const configPath = resolve(process.cwd(), './.env');
 config({ path: configPath });
 
 const connectionManager = new ConnectionManager();
