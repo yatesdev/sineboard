@@ -1,53 +1,36 @@
-import { config } from 'dotenv';
-import { readFileSync } from 'fs';
-import { RedisOptions } from 'ioredis';
-import { resolve } from 'path';
-
-import { Events, IPageDisplay, Queues } from '@yatesdev/sineboard-core';
+import { Events, Queues } from '@yatesdev/sineboard-core';
 import { Logger } from '@yatesdev/sineboard-log';
 
+import config from './configuration';
 import { ConnectionManager } from './ConnectionManager';
 import { DisplayManager } from './DisplayManager';
+import { IClientConfiguration } from './models';
 
 export abstract class SineboardClientBase {
   private readonly connection: ConnectionManager;
-  private readonly clientConfig: IClientConfigurationOptions;
+  private readonly clientConfig: IClientConfiguration;
   private readonly display: DisplayManager;
 
   protected readonly transformers: Transformer[] = [];
 
-  constructor(overrides?: Partial<IClientConfigurationOptions>) {
-    const configPath = resolve(process.cwd(), './.env');
-    config({path: configPath});
-
-    this.clientConfig = {
-      name: process.env.CLIENT_NAME || 'SineboardClient',
-      redis: {
-        host: process.env.REDIS_HOST || '127.0.0.1',
-        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
-      },
-    };
-
-    this.clientConfig = Object.assign(this.clientConfig, overrides);
-    Logger.debug(this.clientConfig);
-
-    Logger.info('Connecting to Redis...');
-    this.connection = new ConnectionManager(this.clientConfig.redis);
-    Logger.info('Done!');
-
+  constructor(overrides?: Partial<IClientConfiguration>) {
+    this.clientConfig = config;
     this.display = new DisplayManager();
+    this.connection = new ConnectionManager(this.clientConfig.connection.redis);
   }
 
-  get templateHeight() {
-    return this.display.maxHeight;
+  get displayHeight() {
+    return this.clientConfig.metadata.displayHeight;
   }
 
-  get templateWidth() {
-    return this.display.maxWidth;
+  get displayWidth() {
+    return this.clientConfig.metadata.displayWidth;
   }
 
   async start() {
+    Logger.info('Connecting to Redis...');
     await this.connection.subscribeToChannel(Events.TemplateRendered);
+
     this.connection.channels.get(Events.TemplateRendered).on('message', this.onTemplateRendered.bind(this));
 
     await this.registerSelf();
@@ -71,30 +54,23 @@ export abstract class SineboardClientBase {
   }
 
   private async registerSelf() {
-    const templateKey = `template:${this.clientConfig.name}`;
-    const template = this.loadTemplate();
+    const exportConfig = Object.entries(this.clientConfig).reduce((acc, kv) => {
+      if (kv[0] === 'connection') { return acc; } // can I use keyof in future?
+      acc[kv[0]] = JSON.stringify(kv[1]);
+      return acc;
+    }, Object.create(null));
 
-    await this.connection.redis.pipeline()
-      .sadd('clients', this.clientConfig.name) // TODO: Add Unique Identifier to client name
-      .set(templateKey, template)
-      .rpush(Queues.TemplateInitialization, templateKey)
-      .publish(Events.ConfigurationLoaded, templateKey)
-      .exec();
-  }
-
-  private loadTemplate(path = './config.json'): string {
-    const configPath = resolve(process.cwd(), path);
-    const rawConfig = readFileSync(configPath);
-    let parsedConfig = JSON.parse(rawConfig.toString()) as IPageDisplay | IPageDisplay[];
-
-    if (!Array.isArray(parsedConfig)) {
-      parsedConfig = [parsedConfig];
+    const clientKey = `client:${this.clientConfig.metadata.name}`;
+    try {
+      await this.connection.redis.multi()
+        .sadd('clients', this.clientConfig.metadata.name)
+        .hmset(clientKey, exportConfig)
+        .rpush(Queues.TemplateInitialization, clientKey)
+        .publish(Events.ConfigurationLoaded, clientKey)
+        .exec();
+    } catch (error) {
+      Logger.error(error);
     }
-    parsedConfig.forEach((template) => {
-      this.display.set(template);
-    });
-
-    return JSON.stringify(parsedConfig);
   }
 
   async onTemplateRendered(_: string, key: string) {
@@ -116,10 +92,6 @@ export abstract class SineboardClientBase {
 }
 
 type Transformer = (args: Buffer, ...rest: any) => Buffer;
-interface IClientConfigurationOptions {
-  name: string;
-  redis: RedisOptions;
-}
 
 const pipe = <T extends any[], R>(
   fn1: (...args: T) => R,
