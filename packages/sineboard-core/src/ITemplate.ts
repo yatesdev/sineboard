@@ -2,7 +2,7 @@ import { Canvas } from '../types/canvas';
 import { IDataSource, IDataSourceDefinition } from './IDataSource';
 import { IRenderer, IRendererDefinition } from './IRenderer';
 
-export abstract class ITemplate {
+export interface ITemplate {
   name: string;
   width: number;
   height: number;
@@ -23,6 +23,6 @@ export interface ITemplateDefinition {
   posY: number;
   dataSource: IDataSourceDefinition | string;
   renderer: IRendererDefinition | string;
-  parent?: ITemplate;
-  children?: Array<ITemplate | string>;
+  parent?: ITemplateDefinition;
+  children?: Array<ITemplateDefinition | string>;
 }
