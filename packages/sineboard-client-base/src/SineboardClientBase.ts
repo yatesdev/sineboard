@@ -48,6 +48,8 @@ export abstract class SineboardClientBase {
 
     Logger.info('Starting Display...');
     this.displayLoop();
+
+    this.hearbeat();
   }
 
   private displayLoop() {
@@ -63,6 +65,14 @@ export abstract class SineboardClientBase {
         this.displayLoop();
       }, 5000);
     }
+  }
+
+  private hearbeat() {
+    this.connection.redis.zadd('clientHeartbeat', (new Date().getTime() / 1000).toFixed(0), this.clientConfig.metadata.name);
+    setInterval(async () => {
+      await this.connection.redis.zadd('clientHeartbeat', (new Date().getTime() / 1000).toFixed(0), this.clientConfig.metadata.name);
+      this.hearbeat();
+    }, 60000);
   }
 
   private async registerSelf() {
