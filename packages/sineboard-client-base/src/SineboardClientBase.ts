@@ -35,6 +35,7 @@ export abstract class SineboardClientBase {
     Logger.info(`Starting Client: ${this.clientConfig.metadata.name}...`);
     Logger.info('Connecting to Redis...');
     const conn = await this.connection.subscribeToChannelPattern(`${this.clientConfig.metadata.name}:*`);
+    // Wrap this as its own eventEmitter?
     conn.on('pmessage', (pattern: string, channel: string, message) => {
       switch (channel.split(':').slice(-1)[0]) {
         case Events.TemplateRendered:
@@ -52,27 +53,27 @@ export abstract class SineboardClientBase {
     this.hearbeat();
   }
 
-  private displayLoop() {
-    if (this.display.any()) {
-      const nextScreen = this.display.next().value;
-      setTimeout(() => {
+  private wait(time: number) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  }
+  private async displayLoop() {
+    while (true) {
+      if (this.display.any()) {
+        const nextScreen = this.display.next().value;
         this.onDisplay(nextScreen.page, nextScreen.buffer);
-        this.displayLoop();
-      }, nextScreen.page.schedule.displayTime * 1000);
-    } else {
-      this.onEmptyDisplay();
-      setTimeout(() => {
-        this.displayLoop();
-      }, 5000);
+        await this.wait(nextScreen.page.schedule.displayTime * 1000);
+      } else {
+        this.onEmptyDisplay();
+        await this.wait(5000);
+      }
     }
   }
 
-  private hearbeat() {
-    this.connection.redis.zadd('clientHeartbeat', (new Date().getTime() / 1000).toFixed(0), this.clientConfig.metadata.name);
-    setInterval(async () => {
-      await this.connection.redis.zadd('clientHeartbeat', (new Date().getTime() / 1000).toFixed(0), this.clientConfig.metadata.name);
-      this.hearbeat();
-    }, 60000);
+  private async hearbeat() {
+    while (true) {
+      this.connection.redis.zadd('clientHeartbeat', (new Date().getTime() / 1000).toFixed(0), this.clientConfig.metadata.name);
+      await this.wait(60000);
+    }
   }
 
   private async registerSelf() {
