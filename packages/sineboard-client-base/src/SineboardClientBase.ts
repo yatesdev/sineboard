@@ -1,4 +1,4 @@
-import { Events, Queues } from '@yatesdev/sineboard-core';
+import { Events, IDisplayTemplate, Queues } from '@yatesdev/sineboard-core';
 import { Logger } from '@yatesdev/sineboard-log';
 
 import config from './configuration';
@@ -56,7 +56,7 @@ export abstract class SineboardClientBase {
     if (this.display.any()) {
       const nextScreen = this.display.next().value;
       setTimeout(() => {
-        this.onDisplay(nextScreen.buffer);
+        this.onDisplay(nextScreen.page, nextScreen.buffer);
         this.displayLoop();
       }, nextScreen.page.schedule.displayTime * 1000);
     } else {
@@ -107,11 +107,10 @@ export abstract class SineboardClientBase {
     if (this.transformers.length > 0) {
       outputBuffer = pipe<any, Buffer>(...(this.transformers) as [Transformer, Transformer])(buffer);
     }
-
     this.display.set(template.template, outputBuffer);
   }
 
-  abstract onDisplay(display: any): void;
+  abstract onDisplay(template: IDisplayTemplate, buffer: Buffer): void;
   abstract onEmptyDisplay(): void;
 }
 
