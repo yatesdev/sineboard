@@ -30,6 +30,7 @@ export class TemplateInitializer {
     const metadata: any = JSON.parse(await this.connectionManager.redis.hget(clientHashKey, 'metadata'));
     const configuration: IDisplayTemplate[] = JSON.parse(await this.connectionManager.redis.hget(clientHashKey, 'template'));
 
+    if (!configuration) { return; }
     configuration.forEach((page) => {
       const temp = TemplateFactory(page.template);
 

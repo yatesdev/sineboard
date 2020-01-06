@@ -11,7 +11,7 @@ import { moduleLoader } from '../util';
 export const TemplateFactory = (root: ITemplateDefinition | string): ITemplate => {
   if (typeof root === 'string') {
     const templateModule = moduleLoader([root])[0].default;
-    root = new templateModule();
+    root = new templateModule() as ITemplate;
     return TemplateFactory(root);
   }
   if (Array.isArray(root.children)) {
