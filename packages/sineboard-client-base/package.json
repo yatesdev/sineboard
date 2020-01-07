@@ -12,7 +12,7 @@
     "clean": "rimraf ./dist",
     "lint": "tslint --project .",
     "prepublishOnly": "npm run clean & npm run lint && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Mike Yates <mike@yatesdev.com>",
   "license": "ISC",
@@ -24,10 +24,13 @@
   },
   "devDependencies": {
     "@types/ioredis": "^4.14.1",
+    "@types/jest": "^24.0.25",
     "@types/shortid": "^0.0.29",
     "@yatesdev/sineboard-core": "~0",
+    "jest": "^24.9.0",
     "nodemon": "^1.19.1",
     "rimraf": "^3.0.0",
+    "ts-jest": "^24.2.0",
     "ts-node": "^8.3.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
