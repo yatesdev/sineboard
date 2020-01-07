@@ -14,8 +14,8 @@ export class DataSourceManager {
     this.scheduleJobs = new Map();
   }
 
-  add(dataSource: IDataSource, schedule: ISchedule, templateName: string, onFetch: () => void) {
-    const scheduleKey = templateName + hash(schedule + templateName);
+  add(dataSource: IDataSource, schedule: ISchedule, templateName: string, clientName: string, onFetch: () => void) {
+    const scheduleKey = `${clientName}:${templateName}:${hash(schedule)}`;
 
     if (!this.scheduleJobs.has(scheduleKey)) {
       const scheduleJobStart = new CronJob({
@@ -65,5 +65,14 @@ export class DataSourceManager {
 
     const scheduledDataSourceJobs = this.dataSourceJobs.get(scheduleKey);
     scheduledDataSourceJobs.push(dataSourceJob);
+  }
+
+  remove(...scheduleKeys: string[]) {
+    for (const scheduleKey of scheduleKeys) {
+      this.dataSourceJobs.get(scheduleKey).forEach((job) => job.stop());
+      this.dataSourceJobs.delete(scheduleKey);
+      this.scheduleJobs.get(scheduleKey).forEach((job) => job.stop());
+      this.scheduleJobs.delete(scheduleKey);
+    }
   }
 }

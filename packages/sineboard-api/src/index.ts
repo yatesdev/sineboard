@@ -14,4 +14,4 @@ const dataSourceManager = new DataSourceManager(connectionManager);
 const templateListener = new TemplateInitializer(connectionManager, dataSourceManager);
 templateListener.start();
 
-cleanupDeadClientJob(connectionManager);
+cleanupDeadClientJob(connectionManager, dataSourceManager);

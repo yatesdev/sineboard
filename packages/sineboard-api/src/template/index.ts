@@ -27,6 +27,7 @@ export class TemplateInitializer {
   }
 
   private async loadClientConfiguration(clientHashKey: string) {
+    // TODO: Typings for metadata
     const metadata: any = JSON.parse(await this.connectionManager.redis.hget(clientHashKey, 'metadata'));
     const configuration: IDisplayTemplate[] = JSON.parse(await this.connectionManager.redis.hget(clientHashKey, 'template'));
 
@@ -45,6 +46,7 @@ export class TemplateInitializer {
           template.dataSource,
           page.schedule,
           template.name,
+          metadata.name,
           this.dataSourceUpdated(template, page, metadata.name));
       });
     });
