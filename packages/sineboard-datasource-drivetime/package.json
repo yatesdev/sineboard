@@ -19,7 +19,7 @@
   "dependencies": {
     "@google/maps": "^1.0.2",
     "@yatesdev/sineboard-log": "~0",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "humanize-duration": "^3.21.0"
   },
   "peerDependencies": {
